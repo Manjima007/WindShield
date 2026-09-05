@@ -1186,7 +1186,7 @@ def main():
                 nc1, nc2 = st.columns(2, gap="large")
                 with nc1:
                     st.markdown(
-                        f"<div class='ws-card'><h3>Plain-English explanation</h3>"
+                        f"<div class='ws-card'><h3>Explanation</h3>"
                         f"<div class='ws-prose'>{narr_txt}</div></div>",
                         unsafe_allow_html=True,
                     )
