@@ -310,7 +310,7 @@ def compute_live_pipeline(freq="15min", cv=5):
     return data, res, X, y, win_ts, model, conformal, meta
 
 
-@st.cache_resource(show_spinner=False)
+@st.cache_data(show_spinner=False)
 def shap_importance(X, y, model=None):
     """Feature importance via SHAP (cached across reruns).
 
