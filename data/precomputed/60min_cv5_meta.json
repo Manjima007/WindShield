@@ -1,0 +1,1 @@
+{"freq": "60min", "cv": 5, "random_state": 7, "n_windows": 2160, "n_fraud_windows": 32, "precision": 0.9999999999677419, "recall": 0.9687499999697267, "f2": 0.974842767264942, "generated_at": "2026-09-04 20:13:58"}
