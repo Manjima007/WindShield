@@ -310,28 +310,6 @@ def compute_live_pipeline(freq="15min", cv=5):
     return data, res, X, y, win_ts, model, conformal, meta
 
 
-@st.cache_data(show_spinner=False)
-def shap_importance(X, y, model=None):
-    """Feature importance via SHAP (cached across reruns).
-
-    Reuses the already-loaded trained ``model`` when available so a page load
-    never pays to refit a classifier just to draw this chart.
-    """
-    if model is None:
-        from src.classifier import FraudSpikeClassifier
-        model = FraudSpikeClassifier().fit(X, y)
-    try:
-        import shap
-        explainer = shap.TreeExplainer(model.model)
-        sv = explainer.shap_values(X)
-        if isinstance(sv, list):
-            sv = np.asarray(sv[-1])
-        imp = np.abs(sv).mean(axis=0)
-        return pd.Series(imp, index=X.columns).sort_values(ascending=False)
-    except Exception:
-        return None
-
-
 # --------------------------------------------------------------------------
 # LIVE SCORING — one-window feature builder matching make_features (validated)
 # --------------------------------------------------------------------------
@@ -1040,34 +1018,6 @@ def main():
                 st.plotly_chart(fig3, width="stretch")
             except Exception:
                 pass
-
-        with st.expander("🧠 Which features matter most"):
-            if st.button("Show feature importance", key="shap_button"):
-                with st.spinner("Computing feature importance …"):
-                    imp = shap_importance(X, y, model)
-                if imp is None:
-                    st.info("SHAP unavailable in this environment.")
-            else:
-                imp = None
-                st.caption(
-                    "Which signals matter most to the detector's decisions. "
-                    "Tap the button to compute — it takes a second.",
-                )
-            if imp is not None:
-                top = imp.head(12).sort_values()
-                fig4 = go.Figure(go.Bar(
-                    x=top.values, y=top.index, orientation="h",
-                    marker=dict(color=[OK if v > 0 else FRAUD for v in top.values]),
-                ))
-                fig4.update_layout(
-                    height=340,
-                    margin=dict(l=10, r=10, t=10, b=10),
-                    paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-                    font=dict(color=TEXT, family="system-ui"),
-                    xaxis=dict(title="Mean |SHAP|", gridcolor="#ddd"),
-                    yaxis=dict(autorange="reversed", gridcolor="#ddd"),
-                )
-                st.plotly_chart(fig4, width="stretch")
 
         with st.expander("⚠️ Known limitations — stated plainly"):
             st.markdown(
